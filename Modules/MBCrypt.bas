@@ -4,15 +4,15 @@ Option Explicit
 'https://www.thesslstore.com/blog/difference-sha-1-sha-2-sha-256-hash-algorithms/
 'https://learn.microsoft.com/de-de/windows/win32/seccng/creating-a-hash-with-cng
 
-
 'bcrypt.h
-
 Private Enum ENTSTATUS
 '#define BCRYPT_SUCCESS(Status) (((NTSTATUS)(Status)) >= 0)
-    STATUS_SUCCESS = 0
-    STATUS_INVALID_HANDLE = -1
+    STATUS_SUCCESS = 0          'The function was successful.
+    STATUS_INVALID_HANDLE = &HC0000008 '-1073741816  'The algorithm handle in the hAlgorithm parameter is not valid.
     STATUS_UNSUCCESSFUL = &HC0000001
-    
+    STATUS_BUFFER_TOO_SMALL = &HC0000023    'The size of the hash object specified by the cbHashObject parameter is not large enough to hold the hash object.
+    STATUS_NOT_SUPPORTED = &HC00000BB      'The algorithm provider specified by the hAlgorithm parameter does not support the hash or MAC interface.
+    STATUS_INVALID_PARAMETER = &HC000000D  'One or more parameters are not valid.
 End Enum
 'https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptopenalgorithmprovider
 'NTSTATUS BCryptOpenAlgorithmProvider( [out] BCRYPT_ALG_HANDLE *phAlgorithm, [in]  LPCWSTR           pszAlgId, [in]  LPCWSTR           pszImplementation, [in]  ULONG dwFlags);
@@ -20,7 +20,7 @@ Private Declare Function BCryptOpenAlgorithmProvider Lib "BCrypt" (ByRef phAlgor
 
 'https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptclosealgorithmprovider
 'NTSTATUS BCryptCloseAlgorithmProvider( [in, out] BCRYPT_ALG_HANDLE hAlgorithm, [in] ULONG dwFlags);
-Private Declare Function BCryptCloseAlgorithmProvider Lib "BCrypt" (ByRef hAlgorithm As LongPtr, ByVal dwFlags As Long) As ENTSTATUS
+Private Declare Function BCryptCloseAlgorithmProvider Lib "BCrypt" (ByVal hAlgorithm As LongPtr, ByVal dwFlags As Long) As ENTSTATUS
 
 'https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptgetproperty
 'NTSTATUS BCryptGetProperty( [in] BCRYPT_HANDLE hObject, [in] LPCWSTR pszProperty, [out] PUCHAR pbOutput, [in] ULONG cbOutput, [out] ULONG *pcbResult, [in] ULONG dwFlags);
@@ -28,19 +28,19 @@ Private Declare Function BCryptGetProperty Lib "BCrypt" (ByVal hObject As LongPt
 
 'https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptcreatehash
 'NTSTATUS BCryptCreateHash([in, out] BCRYPT_ALG_HANDLE hAlgorithm, [out] BCRYPT_HASH_HANDLE *phHash, [out] PUCHAR pbHashObject, [in, optional] ULONG cbHashObject, [in, optional] PUCHAR pbSecret, [in] ULONG cbSecret, [in] ULONG dwFlags);
-Private Declare Function BCryptCreateHash Lib "BCrypt" (ByRef hAlgorithm_inout As LongPtr, ByRef phHash_out As LongPtr, ByRef pbHashObject_out As LongPtr, ByVal cbHashObject As Long, ByVal pbSecret As Long, ByVal cbSecret As Long, ByVal dwFlags As Long) As ENTSTATUS
+Private Declare Function BCryptCreateHash Lib "BCrypt" (ByVal hAlgorithm_inout As LongPtr, ByRef phHash_out As LongPtr, ByRef pbHashObject_out As LongPtr, ByVal cbHashObject As Long, ByVal pbSecret As Long, ByVal cbSecret As Long, ByVal dwFlags As Long) As ENTSTATUS
 
-'https://learn.microsoft.com/de-de/windows/win32/api/bcrypt/nf-bcrypt-bcrypthashdata
+'https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcrypthashdata
 'NTSTATUS BCryptHashData([in, out] BCRYPT_HASH_HANDLE hHash, [in] PUCHAR pbInput, [in] ULONG cbInput, [in] ULONG dwFlags);
-Private Declare Function BCryptHashData Lib "BCrypt" (ByRef hHash_inout As LongPtr, ByVal pbInput As LongPtr, ByVal cbInput As Long, ByVal dwFlags As Long) As ENTSTATUS
+Private Declare Function BCryptHashData Lib "BCrypt" (ByVal hHash_inout As LongPtr, ByVal pbInput As LongPtr, ByVal cbInput As Long, ByVal dwFlags As Long) As ENTSTATUS
 
 'https://learn.microsoft.com/de-de/windows/win32/api/bcrypt/nf-bcrypt-bcryptfinishhash
 'NTSTATUS BCryptFinishHash([in, out] BCRYPT_HASH_HANDLE hHash, [out] PUCHAR pbOutput, [in] ULONG cbOutput, [in] ULONG dwFlags);
-Private Declare Function BCryptFinishHash Lib "BCrypt" (ByRef hHash_inout As LongPtr, ByRef pbOutput As LongPtr, ByVal cbOutput As Long, ByVal dwFlags As Long) As ENTSTATUS
+Private Declare Function BCryptFinishHash Lib "BCrypt" (ByVal hHash_inout As LongPtr, ByRef pbOutput As LongPtr, ByVal cbOutput As Long, ByVal dwFlags As Long) As ENTSTATUS
 
 'https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptdestroyhash
 'NTSTATUS BCryptDestroyHash( [in, out] BCRYPT_HASH_HANDLE hHash );
-Private Declare Function BCryptDestroyHash Lib "BCrypt" (ByRef hHash As LongPtr) As ENTSTATUS
+Private Declare Function BCryptDestroyHash Lib "BCrypt" (ByVal hHash As LongPtr) As ENTSTATUS
 
 'https://learn.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapalloc
 'DECLSPEC_ALLOCATOR LPVOID HeapAlloc( [in] HANDLE hHeap, [in] DWORD dwFlags, [in] SIZE_T dwBytes);
@@ -219,15 +219,9 @@ Private Const BCRYPT_MULTI_OBJECT_LENGTH  As String = "MultiObjectLength"
 '#if (NTDDI_VERSION >= NTDDI_WIN10_RS4)
 Private Const BCRYPT_IS_IFX_TPM_WEAK_KEY  As String = "IsIfxTpmWeakKey"
 
-
-
-
 'Private Const BCRYPT_SHA256_ALGORITHM As String = "SHA256"
 'Private Const BCRYPT_OBJECT_LENGTH    As Long = 0
 Private Const sizeof_DWORD            As Long = 4
-
-
-
 
 Private m_status       As Long
 Private m_hAlgo        As LongPtr
@@ -269,20 +263,30 @@ Public Function TryGetHash(Bytes() As Byte) As Byte()
     If m_pbHash = 0 Then
         MsgBox "**** memory allocation for Hash failed"
         Call CleanUp: Exit Function
+    Else
+        'rtlmovememory(m_pbHash, bytes(0),
     End If
     
     'create a hash
+    'm_status = BCryptCreateHash(m_hAlgo, m_pbHash, ByVal m_pbHashObject, m_cbHashObject, 0, 0, 0)
     m_status = BCryptCreateHash(m_hAlgo, m_pbHash, ByVal m_pbHashObject, m_cbHashObject, 0, 0, 0)
     If Not (m_status >= STATUS_SUCCESS) Then
+        'was ist error C0000008
         MsgBox "**** Error " & Hex(m_status) & " returned by BCryptCreateHash" & vbCrLf & MErr.WinApiError_ToStr(m_status)
         Call CleanUp: Exit Function
     End If
     
     'hash some data
-    m_status = BCryptHashData(m_hHash, ByVal m_pbHashObject, m_cbHashObject, 0)
+    'm_status = BCryptHashData(m_hHash, m_pbHashObject, m_cbHashObject, 0)
+    Dim lpInput As LongPtr: lpInput = VarPtr(Bytes(0))
+    Dim cbInput As Long:    cbInput = UBound(Bytes) + 1
+    Debug.Print lpInput & " " & cbInput
+    m_status = BCryptHashData(m_hHash, lpInput, cbInput, 0)
     If Not (m_status >= STATUS_SUCCESS) Then
-        
+        MsgBox "**** Error " & Hex(m_status) & " returned by BCryptHashData" & vbCrLf & MErr.WinApiError_ToStr(m_status)
+        Call CleanUp: Exit Function
     End If
+   '//hash some data
     'if(!NT_SUCCESS(status = BCryptHashData(
     '                                    hHash,
     '                                    (PBYTE)rgbMsg,
@@ -295,33 +299,13 @@ Public Function TryGetHash(Bytes() As Byte) As Byte()
     
     Call CleanUp
 
-'    //create a hash
-'    if(!NT_SUCCESS(status = BCryptCreateHash(
-'                                        hAlg,
-'                                        &hHash,
-'                                        pbHashObject,
-'                                        cbHashObject,
-'                                        NULL,
-'                                        0,
-'                                        0)))
-'    {
-'        wprintf(L"**** Error 0x%x returned by BCryptCreateHash\n", status);
-'        goto Cleanup;
-'    }
-'
-'
-'    //hash some data
-'    if(!NT_SUCCESS(status = BCryptHashData(
-'                                        hHash,
-'                                        (PBYTE)rgbMsg,
-'                                        sizeof(rgbMsg),
-'                                        0)))
 End Function
 
 Private Function TryGetAlgorithmProvider(ByRef HandleAlgo_out As LongPtr) As Boolean
 Try: On Error GoTo Catch
     m_status = BCryptOpenAlgorithmProvider(HandleAlgo_out, StrPtr(BCRYPT_SHA256_ALGORITHM), 0, 0)
     TryGetAlgorithmProvider = m_status >= STATUS_SUCCESS
+    'If Not TryGetAlgorithmProvider Then MsgBox ENTSTATUS_ToStr(m_status)
 Catch:
 End Function
 
@@ -329,6 +313,7 @@ Private Function TryGetProperty_ObjectLength() As Boolean
 Try: On Error GoTo Catch
     m_status = BCryptGetProperty(m_hAlgo, StrPtr(BCRYPT_OBJECT_LENGTH), m_cbHashObject, sizeof_DWORD, m_cbData, 0)
     TryGetProperty_ObjectLength = m_status >= STATUS_SUCCESS
+    'If Not TryGetProperty_ObjectLength Then MsgBox ENTSTATUS_ToStr(m_status)
 Catch:
 End Function
 
@@ -336,6 +321,7 @@ Private Function TryGetProperty_HashLength() As Boolean
 Try: On Error GoTo Catch
     m_status = BCryptGetProperty(m_hAlgo, StrPtr(BCRYPT_HASH_LENGTH), m_pbHash, sizeof_DWORD, m_cbData, 0)
     TryGetProperty_HashLength = m_status >= STATUS_SUCCESS
+    'If Not TryGetProperty_HashLength Then MsgBox ENTSTATUS_ToStr(m_status)
 Catch:
 End Function
 
@@ -346,6 +332,10 @@ Catch:
 End Function
 
 Private Sub CleanUp()
+    If m_status Then
+        MsgBox ENTSTATUS_ToStr(m_status)
+        m_status = 0
+    End If
     If m_hAlgo Then
         BCryptCloseAlgorithmProvider m_hAlgo, 0
         m_hAlgo = 0
@@ -363,6 +353,20 @@ Private Sub CleanUp()
         m_pbHash = 0
     End If
 End Sub
+
+Private Function ENTSTATUS_ToStr(e As ENTSTATUS) As String
+    Dim s As String
+    Select Case e
+    Case ENTSTATUS.STATUS_SUCCESS:           s = "STATUS_SUCCESS: The function was successful"
+    Case ENTSTATUS.STATUS_INVALID_HANDLE:    s = "STATUS_INVALID_HANDLE: The algorithm handle in the hAlgorithm parameter is not valid."
+    Case ENTSTATUS.STATUS_UNSUCCESSFUL:      s = "STATUS_UNSUCCESSFUL: No Success "
+    Case ENTSTATUS.STATUS_BUFFER_TOO_SMALL:  s = "STATUS_BUFFER_TOO_SMALL: The size of the hash object specified by the cbHashObject parameter is not large enough to hold the hash object."
+    Case ENTSTATUS.STATUS_NOT_SUPPORTED:     s = "STATUS_NOT_SUPPORTED: The algorithm provider specified by the hAlgorithm parameter does not support the hash or MAC interface."
+    Case ENTSTATUS.STATUS_INVALID_PARAMETER: s = "STATUS_INVALID_PARAMETER: One or more parameters are not valid."
+    End Select
+    ENTSTATUS_ToStr = s
+End Function
+
 '// THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF
 '// ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO
 '// THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A

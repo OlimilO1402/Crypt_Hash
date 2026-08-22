@@ -27,7 +27,7 @@ Friend Sub New_(ByVal aHashAlgo As EBCryptHashAlgo)
 End Sub
 
 Public Function GetHash(Value() As Byte) As Byte()
-
+    GetHash = MBCrypt.TryGetHash(Value())
 End Function
 
 ' v ############################## v '    Implements IHasher    ' v ############################## v '

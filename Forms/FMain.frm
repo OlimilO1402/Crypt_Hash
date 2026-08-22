@@ -504,57 +504,60 @@ Option Explicit
 
 
 Private Sub Form_Load()
-    TxtUserText.Text = "The Quick Brown Fox Jumps Over The Lazy Dog"
+    TxtUserText.text = "The Quick Brown Fox Jumps Over The Lazy Dog"
     Me.Caption = Me.Caption & " v" & App.Major & "." & App.Minor & "." & App.Revision
 End Sub
 
 Private Sub Form_Resize()
-    Dim L As Single, t As Single, W As Single, H As Single
+    Dim l As Single, t As Single, W As Single, H As Single
     t = LBLDragDropFileCRC32.Top
     W = Me.ScaleWidth
     H = LBLDragDropFileCRC32.Height
-    If W > 0 And H > 0 Then LBLDragDropFileCRC32.Move L, t, W, H
+    If W > 0 And H > 0 Then LBLDragDropFileCRC32.Move l, t, W, H
     t = TxtUserText.Top
     H = TxtUserText.Height
-    If W > 0 And H > 0 Then TxtUserText.Move L, t, W, H
-    L = TxtCRC32JAM.Left
-    W = Me.ScaleWidth - L
+    If W > 0 And H > 0 Then TxtUserText.Move l, t, W, H
+    l = TxtCRC32JAM.Left
+    W = Me.ScaleWidth - l
     H = TxtCRC32JAM.Height
     t = TxtCRC32JAM.Top
-    If W > 0 And H > 0 Then TxtCRC32JAM.Move L, t, W, H
+    If W > 0 And H > 0 Then TxtCRC32JAM.Move l, t, W, H
     t = TxtCRC32MEF.Top
-    If W > 0 And H > 0 Then TxtCRC32MEF.Move L, t, W, H
+    If W > 0 And H > 0 Then TxtCRC32MEF.Move l, t, W, H
     t = TxtMSCryptRC4.Top
-    If W > 0 And H > 0 Then TxtMSCryptRC4.Move L, t, W, H
+    If W > 0 And H > 0 Then TxtMSCryptRC4.Move l, t, W, H
     t = TxtMSCryptMD5.Top
-    If W > 0 And H > 0 Then TxtMSCryptMD5.Move L, t, W, H
+    If W > 0 And H > 0 Then TxtMSCryptMD5.Move l, t, W, H
     t = TxtMSCryptSHA.Top
-    If W > 0 And H > 0 Then TxtMSCryptSHA.Move L, t, W, H
+    If W > 0 And H > 0 Then TxtMSCryptSHA.Move l, t, W, H
     t = TxtBCryptSHA256.Top
-    If W > 0 And H > 0 Then TxtBCryptSHA256.Move L, t, W, H
+    If W > 0 And H > 0 Then TxtBCryptSHA256.Move l, t, W, H
     t = TxtBCryptSHA384.Top
-    If W > 0 And H > 0 Then TxtBCryptSHA384.Move L, t, W, H
+    If W > 0 And H > 0 Then TxtBCryptSHA384.Move l, t, W, H
     t = TxtBCryptSHA512.Top
     H = Me.ScaleHeight - t
-    If W > 0 And H > 0 Then TxtBCryptSHA512.Move L, t, W, H
+    If W > 0 And H > 0 Then TxtBCryptSHA512.Move l, t, W, H
 End Sub
 
-Private Sub LBLDragDropFileCRC32_OLEDragDrop(Data As DataObject, Effect As Long, Button As Integer, Shift As Integer, x As Single, Y As Single)
-    OnOLEDragDrop Data, Effect, Button, Shift, x, Y
+Private Sub LBLDragDropFileCRC32_OLEDragDrop(Data As DataObject, Effect As Long, Button As Integer, Shift As Integer, x As Single, y As Single)
+    OnOLEDragDrop Data, Effect, Button, Shift, x, y
 End Sub
-Private Sub Form_OLEDragDrop(Data As DataObject, Effect As Long, Button As Integer, Shift As Integer, x As Single, Y As Single)
-    OnOLEDragDrop Data, Effect, Button, Shift, x, Y
+Private Sub Form_OLEDragDrop(Data As DataObject, Effect As Long, Button As Integer, Shift As Integer, x As Single, y As Single)
+    OnOLEDragDrop Data, Effect, Button, Shift, x, y
 End Sub
 
-Private Sub OnOLEDragDrop(Data As DataObject, Effect As Long, Button As Integer, Shift As Integer, x As Single, Y As Single)
+Private Sub OnOLEDragDrop(Data As DataObject, Effect As Long, Button As Integer, Shift As Integer, x As Single, y As Single)
     If Not Data.GetFormat(ClipBoardConstants.vbCFFiles) Then Exit Sub
     Dim PFN As String: PFN = Data.Files(1)
     Dim Value() As Byte: Value = GetValueFromFile(PFN)
-    TxtCRC32JAM.Text = GetHashString(MNew.CRC32(ECRC32Algo.CRC32_JAMCRC), Value)
-    TxtCRC32MEF.Text = GetHashString(MNew.CRC32(ECRC32Algo.CRC32_MEF), Value)
-    TxtMSCryptRC4.Text = GetHashString(MNew.MSCrypt(ECryptHashAlgo.ha_RC4), Value)
-    TxtMSCryptMD5.Text = GetHashString(MNew.MSCrypt(ECryptHashAlgo.ha_MD5), Value)
-    TxtMSCryptSHA.Text = GetHashString(MNew.MSCrypt(ECryptHashAlgo.ha_SHA), Value)
+    TxtCRC32JAM.text = GetHashString(MNew.CRC32(ECRC32Algo.CRC32_JAMCRC), Value)
+    TxtCRC32MEF.text = GetHashString(MNew.CRC32(ECRC32Algo.CRC32_MEF), Value)
+    TxtMSCryptRC4.text = GetHashString(MNew.MSCrypt(ECryptHashAlgo.ha_RC4), Value)
+    TxtMSCryptMD5.text = GetHashString(MNew.MSCrypt(ECryptHashAlgo.ha_MD5), Value)
+    TxtMSCryptSHA.text = GetHashString(MNew.MSCrypt(ECryptHashAlgo.ha_SHA), Value)
+    TxtBCryptSHA256.text = GetHashString(MNew.MSBCrypt(EBCryptHashAlgo.ha_SHA256), Value)
+    TxtBCryptSHA384.text = GetHashString(MNew.MSBCrypt(EBCryptHashAlgo.ha_SHA384), Value)
+    TxtBCryptSHA512.text = GetHashString(MNew.MSBCrypt(EBCryptHashAlgo.ha_SHA512), Value)
 End Sub
 
 Function GetValueFromFile(PFN As String) As Byte()
@@ -571,7 +574,7 @@ Finally: Close FNr
 End Function
 
 Function GetValueFromUserInput() As Byte()
-    Dim s As String: s = TxtUserText.Text
+    Dim s As String: s = TxtUserText.text
     If Len(s) = 0 Then
         MsgBox "Please give a valid string in edittextbox"
         Exit Function
@@ -593,33 +596,33 @@ Catch:
 End Function
 
 Private Sub BtnCRC32JAM_Click()
-    TxtCRC32JAM.Text = GetHashString(MNew.CRC32(ECRC32Algo.CRC32_JAMCRC), GetValueFromUserInput)
+    TxtCRC32JAM.text = GetHashString(MNew.CRC32(ECRC32Algo.CRC32_JAMCRC), GetValueFromUserInput)
 End Sub
 
 Private Sub BtnCRC32MEF_Click()
-    TxtCRC32MEF.Text = GetHashString(MNew.CRC32(ECRC32Algo.CRC32_MEF), GetValueFromUserInput)
+    TxtCRC32MEF.text = GetHashString(MNew.CRC32(ECRC32Algo.CRC32_MEF), GetValueFromUserInput)
 End Sub
 
 Private Sub BtnMSCryptRC4_Click()
-    TxtMSCryptRC4.Text = GetHashString(MNew.MSCrypt(ECryptHashAlgo.ha_RC4), GetValueFromUserInput)
+    TxtMSCryptRC4.text = GetHashString(MNew.MSCrypt(ECryptHashAlgo.ha_RC4), GetValueFromUserInput)
 End Sub
 
 Private Sub BtnMSCryptMD5_Click()
-    TxtMSCryptMD5.Text = GetHashString(MNew.MSCrypt(ECryptHashAlgo.ha_MD5), GetValueFromUserInput)
+    TxtMSCryptMD5.text = GetHashString(MNew.MSCrypt(ECryptHashAlgo.ha_MD5), GetValueFromUserInput)
 End Sub
 
 Private Sub BtnMSCryptSHA_Click()
-    TxtMSCryptSHA.Text = GetHashString(MNew.MSCrypt(ECryptHashAlgo.ha_SHA), GetValueFromUserInput)
+    TxtMSCryptSHA.text = GetHashString(MNew.MSCrypt(ECryptHashAlgo.ha_SHA), GetValueFromUserInput)
 End Sub
 
 Private Sub BtnBCryptSHA256_Click()
-    TxtBCryptSHA256.Text = GetHashString(MNew.MSBCrypt(EBCryptHashAlgo.ha_SHA256), GetValueFromUserInput)
+    TxtBCryptSHA256.text = GetHashString(MNew.MSBCrypt(EBCryptHashAlgo.ha_SHA256), GetValueFromUserInput)
 End Sub
 
 Private Sub BtnBCryptSHA384_Click()
-    TxtBCryptSHA256.Text = GetHashString(MNew.MSBCrypt(EBCryptHashAlgo.ha_SHA384), GetValueFromUserInput)
+    TxtBCryptSHA256.text = GetHashString(MNew.MSBCrypt(EBCryptHashAlgo.ha_SHA384), GetValueFromUserInput)
 End Sub
 
 Private Sub BtnBCryptSHA512_Click()
-    TxtBCryptSHA256.Text = GetHashString(MNew.MSBCrypt(EBCryptHashAlgo.ha_SHA512), GetValueFromUserInput)
+    TxtBCryptSHA256.text = GetHashString(MNew.MSBCrypt(EBCryptHashAlgo.ha_SHA512), GetValueFromUserInput)
 End Sub
