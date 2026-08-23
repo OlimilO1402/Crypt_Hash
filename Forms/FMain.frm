@@ -549,24 +549,24 @@ End Sub
 Private Sub OnOLEDragDrop(Data As DataObject, Effect As Long, Button As Integer, Shift As Integer, x As Single, y As Single)
     If Not Data.GetFormat(ClipBoardConstants.vbCFFiles) Then Exit Sub
     Dim PFN As String: PFN = Data.Files(1)
-    Dim Value() As Byte: Value = GetValueFromFile(PFN)
+    Dim Value() As Byte: Value = GetFileBuffer(PFN)
     TxtCRC32JAM.text = GetHashString(MNew.CRC32(ECRC32Algo.CRC32_JAMCRC), Value)
     TxtCRC32MEF.text = GetHashString(MNew.CRC32(ECRC32Algo.CRC32_MEF), Value)
     TxtMSCryptRC4.text = GetHashString(MNew.MSCrypt(ECryptHashAlgo.ha_RC4), Value)
     TxtMSCryptMD5.text = GetHashString(MNew.MSCrypt(ECryptHashAlgo.ha_MD5), Value)
     TxtMSCryptSHA.text = GetHashString(MNew.MSCrypt(ECryptHashAlgo.ha_SHA), Value)
     TxtBCryptSHA256.text = GetHashString(MNew.MSBCrypt(EBCryptHashAlgo.ha_SHA256), Value)
-    TxtBCryptSHA384.text = GetHashString(MNew.MSBCrypt(EBCryptHashAlgo.ha_SHA384), Value)
-    TxtBCryptSHA512.text = GetHashString(MNew.MSBCrypt(EBCryptHashAlgo.ha_SHA512), Value)
+    'TxtBCryptSHA384.text = GetHashString(MNew.MSBCrypt(EBCryptHashAlgo.ha_SHA384), Value)
+    'TxtBCryptSHA512.text = GetHashString(MNew.MSBCrypt(EBCryptHashAlgo.ha_SHA512), Value)
 End Sub
 
-Function GetValueFromFile(PFN As String) As Byte()
+Function GetFileBuffer(PFN As String) As Byte()
 Try: On Error GoTo Catch
     Dim FNr As Integer: FNr = FreeFile
     Open PFN For Binary Access Read As FNr
     ReDim FileContent(0 To LOF(FNr) - 1) As Byte
     Get FNr, , FileContent
-    GetValueFromFile = FileContent
+    GetFileBuffer = FileContent
     GoTo Finally
 Catch:
     MsgBox "Error in FMain.GetFileContent"

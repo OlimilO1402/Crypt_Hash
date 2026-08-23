@@ -30,6 +30,11 @@ Public Function GetHash(Value() As Byte) As Byte()
     GetHash = MBCrypt.TryGetHash(Value())
 End Function
 
+'das gewöhnliche Pattern von Hash-Algorithmen:
+'* Init
+'* einmal oder mehrfach Daten rein kippen,
+'* Hash finalisieren lassen und abholen.
+
 ' v ############################## v '    Implements IHasher    ' v ############################## v '
 Private Function IHasher_GetHash(Value() As Byte) As Byte()
     IHasher_GetHash = Me.GetHash(Value)

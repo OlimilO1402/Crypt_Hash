@@ -24,11 +24,16 @@ Private Declare Function BCryptCloseAlgorithmProvider Lib "BCrypt" (ByVal hAlgor
 
 'https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptgetproperty
 'NTSTATUS BCryptGetProperty( [in] BCRYPT_HANDLE hObject, [in] LPCWSTR pszProperty, [out] PUCHAR pbOutput, [in] ULONG cbOutput, [out] ULONG *pcbResult, [in] ULONG dwFlags);
-Private Declare Function BCryptGetProperty Lib "BCrypt" (ByVal hObject As LongPtr, ByVal pszProperty As LongPtr, ByRef pbOutput_out As LongPtr, ByVal cbOutput As Long, ByRef pcbResult_out As Long, ByVal dwFlags As Long) As ENTSTATUS
+'Private Declare Function BCryptGetProperty Lib "BCrypt" (ByVal hObject As LongPtr, ByVal pszProperty As LongPtr, ByRef pbOutput_out As LongPtr, ByVal cbOutput As Long, ByRef pcbResult_out As Long, ByVal dwFlags As Long) As ENTSTATUS
+Private Declare Function BCryptGetProperty Lib "BCrypt" (ByVal hObject As LongPtr, ByVal pszProperty As LongPtr, ByVal pbOutput_out As LongPtr, ByVal cbOutput As Long, ByRef pcbResult_out As Long, ByVal dwFlags As Long) As ENTSTATUS
+
+'Private Declare Function BCryptGetProperty Lib "BCrypt" (ByVal hObject As LongPtr, ByVal pszProperty As LongPtr, ByVal pbOutput_out As LONG_PTR, ByVal cbOutput As Long, ByRef pcbResult_out As Long, ByVal dwFlags As Long) As ENTSTATUS
+'LONG_PTR??
 
 'https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptcreatehash
 'NTSTATUS BCryptCreateHash([in, out] BCRYPT_ALG_HANDLE hAlgorithm, [out] BCRYPT_HASH_HANDLE *phHash, [out] PUCHAR pbHashObject, [in, optional] ULONG cbHashObject, [in, optional] PUCHAR pbSecret, [in] ULONG cbSecret, [in] ULONG dwFlags);
-Private Declare Function BCryptCreateHash Lib "BCrypt" (ByVal hAlgorithm_inout As LongPtr, ByRef phHash_out As LongPtr, ByRef pbHashObject_out As LongPtr, ByVal cbHashObject As Long, ByVal pbSecret As Long, ByVal cbSecret As Long, ByVal dwFlags As Long) As ENTSTATUS
+'Private Declare Function BCryptCreateHash Lib "BCrypt" (ByVal hAlgorithm_inout As LongPtr, ByRef phHash_out As LongPtr, ByRef pbHashObject_out As LongPtr, ByVal cbHashObject As Long, ByVal pbSecret As Long, ByVal cbSecret As Long, ByVal dwFlags As Long) As ENTSTATUS
+Private Declare Function BCryptCreateHash Lib "BCrypt" (ByVal hAlgorithm_inout As LongPtr, ByVal phHash_out As LongPtr, ByRef pbHashObject_out As LongPtr, ByVal cbHashObject As Long, ByVal pbSecret As Long, ByVal cbSecret As Long, ByVal dwFlags As Long) As ENTSTATUS
 
 'https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcrypthashdata
 'NTSTATUS BCryptHashData([in, out] BCRYPT_HASH_HANDLE hHash, [in] PUCHAR pbInput, [in] ULONG cbInput, [in] ULONG dwFlags);
@@ -36,7 +41,7 @@ Private Declare Function BCryptHashData Lib "BCrypt" (ByVal hHash_inout As LongP
 
 'https://learn.microsoft.com/de-de/windows/win32/api/bcrypt/nf-bcrypt-bcryptfinishhash
 'NTSTATUS BCryptFinishHash([in, out] BCRYPT_HASH_HANDLE hHash, [out] PUCHAR pbOutput, [in] ULONG cbOutput, [in] ULONG dwFlags);
-Private Declare Function BCryptFinishHash Lib "BCrypt" (ByVal hHash_inout As LongPtr, ByRef pbOutput As LongPtr, ByVal cbOutput As Long, ByVal dwFlags As Long) As ENTSTATUS
+Private Declare Function BCryptFinishHash Lib "BCrypt" (ByVal hHash_inout As LongPtr, ByVal pbOutput As LongPtr, ByVal cbOutput As Long, ByVal dwFlags As Long) As ENTSTATUS
 
 'https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptdestroyhash
 'NTSTATUS BCryptDestroyHash( [in, out] BCRYPT_HASH_HANDLE hHash );
@@ -45,6 +50,7 @@ Private Declare Function BCryptDestroyHash Lib "BCrypt" (ByVal hHash As LongPtr)
 'https://learn.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapalloc
 'DECLSPEC_ALLOCATOR LPVOID HeapAlloc( [in] HANDLE hHeap, [in] DWORD dwFlags, [in] SIZE_T dwBytes);
 Private Declare Function HeapAlloc Lib "kernel32" (ByVal hHeap As LongPtr, ByVal dwFlags As Long, ByVal dwBytes As Long) As LongPtr
+'Private Declare Function HeapAlloc Lib "kernel32" (ByVal hHeap As LongPtr, ByVal dwFlags As Long, ByVal dwBytes As LongPtr) As LongPtr
 
 'https://learn.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-getprocessheap
 'HANDLE GetProcessHeap();
@@ -223,13 +229,15 @@ Private Const BCRYPT_IS_IFX_TPM_WEAK_KEY  As String = "IsIfxTpmWeakKey"
 'Private Const BCRYPT_OBJECT_LENGTH    As Long = 0
 Private Const sizeof_DWORD            As Long = 4
 
-Private m_status       As Long
-Private m_hAlgo        As LongPtr
-Private m_hHash        As LongPtr
-Private m_cbHashObject As Long
-Private m_pbHashObject As LongPtr
-Private m_cbData       As Long
-Private m_pbHash       As LongPtr
+Private m_status       As ENTSTATUS 'NTSTATUS           status       = STATUS_UNSUCCESSFUL;
+Private m_hAlgo        As LongPtr   'BCRYPT_ALG_HANDLE  hAlg         = NULL;
+Private m_hHash        As LongPtr   'BCRYPT_HASH_HANDLE hHash        = NULL;
+Private m_cbHashObject As Long      'DWORD              cbHashObject = 0;
+Private m_pbHashObject As LongPtr   'PBYTE              pbHashObject = NULL;
+Private m_cbHash       As Long      'DWORD              cbHash       = 0;
+Private m_pbHash       As LongPtr   'PBYTE              pbHash       = NULL;
+Private m_cbData       As Long      'DWORD              cbData       = 0;
+    
 
 Public Function TryGetHash(Bytes() As Byte) As Byte()
     
@@ -238,12 +246,14 @@ Public Function TryGetHash(Bytes() As Byte) As Byte()
         MsgBox "**** Error " & m_status & " returned by BCryptOpenAlgorithmProvider"
         Call CleanUp: Exit Function
     End If
+    Debug.Print m_hAlgo & " = 0x" & Hex(m_hAlgo)
     
     'calculate the size of the buffer to hold the hash object
-    If Not TryGetProperty_ObjectLength Then
+    If Not TryGetProperty_ObjectLength(m_cbHashObject) Then
         MsgBox "**** Error " & m_status & " returned by BCryptGetProperty"
         Call CleanUp: Exit Function
     End If
+    Debug.Print m_cbHashObject & " = 0x" & Hex(m_cbHashObject)
     
     'allocate the hash object on the heap
     m_pbHashObject = HeapAlloc(GetProcessHeap, 0, m_cbHashObject)
@@ -251,51 +261,64 @@ Public Function TryGetHash(Bytes() As Byte) As Byte()
         MsgBox "**** memory allocation for HashObject failed"
         Call CleanUp: Exit Function
     End If
+    Debug.Print m_pbHashObject & " = 0x" & Hex(m_pbHashObject)
     
     'calculate the length of the hash
-    If Not TryGetProperty_HashLength Then
+    If Not TryGetProperty_HashLength(m_cbHash) Then
         MsgBox "**** Error " & m_status & " returned by BCryptGetProperty"
         Call CleanUp: Exit Function
     End If
+    Debug.Print m_cbHash & " = 0x" & Hex(m_cbHash)
     
     'allocate the hash buffer on the heap
-    m_pbHash = HeapAlloc(GetProcessHeap, 0, m_cbHashObject)
+    m_pbHash = HeapAlloc(GetProcessHeap, 0, m_cbHash)
     If m_pbHash = 0 Then
         MsgBox "**** memory allocation for Hash failed"
         Call CleanUp: Exit Function
-    Else
-        'rtlmovememory(m_pbHash, bytes(0),
     End If
+    Debug.Print m_pbHash & " = 0x" & Hex(m_pbHash)
     
     'create a hash
-    'm_status = BCryptCreateHash(m_hAlgo, m_pbHash, ByVal m_pbHashObject, m_cbHashObject, 0, 0, 0)
-    m_status = BCryptCreateHash(m_hAlgo, m_pbHash, ByVal m_pbHashObject, m_cbHashObject, 0, 0, 0)
-    If Not (m_status >= STATUS_SUCCESS) Then
-        'was ist error C0000008
+    'm_status = BCryptCreateHash(m_hAlgo, VarPtr(m_hHash), ByVal m_pbHashObject, m_cbHashObject, 0, 0, 0)
+    'If Not (m_status <> STATUS_SUCCESS) Then
+    If Not TryCreateHash_Handle(m_hHash) Then
         MsgBox "**** Error " & Hex(m_status) & " returned by BCryptCreateHash" & vbCrLf & MErr.WinApiError_ToStr(m_status)
         Call CleanUp: Exit Function
     End If
+    Debug.Print m_hHash & " = 0x" & Hex(m_hHash)
     
     'hash some data
-    'm_status = BCryptHashData(m_hHash, m_pbHashObject, m_cbHashObject, 0)
-    Dim lpInput As LongPtr: lpInput = VarPtr(Bytes(0))
-    Dim cbInput As Long:    cbInput = UBound(Bytes) + 1
-    Debug.Print lpInput & " " & cbInput
-    m_status = BCryptHashData(m_hHash, lpInput, cbInput, 0)
-    If Not (m_status >= STATUS_SUCCESS) Then
+    If Not TryHashData(Bytes) Then
         MsgBox "**** Error " & Hex(m_status) & " returned by BCryptHashData" & vbCrLf & MErr.WinApiError_ToStr(m_status)
         Call CleanUp: Exit Function
     End If
-   '//hash some data
-    'if(!NT_SUCCESS(status = BCryptHashData(
-    '                                    hHash,
-    '                                    (PBYTE)rgbMsg,
-    '                                    sizeof(rgbMsg),
-    '                                    0)))
-    '{
-    '    wprintf(L"**** Error 0x%x returned by BCryptHashData\n", status);
-    '    goto Cleanup;
-    '}
+    
+    'm_status = BCryptHashData(m_hHash, m_pbHashObject, m_cbHashObject, 0)
+    'Dim lpInput As LongPtr: lpInput = VarPtr(Bytes(0))
+    'Dim cbInput As Long:    cbInput = UBound(Bytes) + 1
+    'Debug.Print lpInput & " " & cbInput
+    'm_status = BCryptHashData(m_hHash, lpInput, cbInput, 0)
+    'If Not (m_status >= STATUS_SUCCESS) Then
+    '    MsgBox "**** Error " & Hex(m_status) & " returned by BCryptHashData" & vbCrLf & MErr.WinApiError_ToStr(m_status)
+    '    Call CleanUp: Exit Function
+    'End If
+    
+    Dim HashBytes() As Byte
+    If Not TryFinishHash(HashBytes) Then
+        MsgBox "**** Error " & Hex(m_status) & " returned by BCryptFinishHash" & vbCrLf & MErr.WinApiError_ToStr(m_status)
+        Call CleanUp: Exit Function
+    End If
+    ' close the hash
+    'm_status = BCryptFinishHash(m_hHash, m_pbHash, m_cbHash, 0)
+    'If Not (m_status <> STATUS_SUCCESS) Then
+    '    MsgBox "**** Error " & Hex(m_status) & " returned by BCryptFinishHash" & vbCrLf & MErr.WinApiError_ToStr(m_status)
+    '    Call CleanUp: Exit Function
+    'End If
+    
+    
+    'RtlMoveMemory HashBytes(0), ByVal m_pbHash, m_cbHash
+    
+    TryGetHash = HashBytes
     
     Call CleanUp
 
@@ -303,31 +326,55 @@ End Function
 
 Private Function TryGetAlgorithmProvider(ByRef HandleAlgo_out As LongPtr) As Boolean
 Try: On Error GoTo Catch
+    '//open an algorithm handle
+    'if(!NT_SUCCESS(status = BCryptOpenAlgorithmProvider( &hAlg, BCRYPT_SHA256_ALGORITHM, NULL, 0))) {
+    ' status = BCryptOpenAlgorithmProvider( &hAlg        ,        BCRYPT_SHA256_ALGORITHM, NULL, 0)
     m_status = BCryptOpenAlgorithmProvider(HandleAlgo_out, StrPtr(BCRYPT_SHA256_ALGORITHM), 0, 0)
     TryGetAlgorithmProvider = m_status >= STATUS_SUCCESS
     'If Not TryGetAlgorithmProvider Then MsgBox ENTSTATUS_ToStr(m_status)
 Catch:
 End Function
 
-Private Function TryGetProperty_ObjectLength() As Boolean
+Private Function TryGetProperty_ObjectLength(ByRef Value_out As Long) As Boolean
 Try: On Error GoTo Catch
-    m_status = BCryptGetProperty(m_hAlgo, StrPtr(BCRYPT_OBJECT_LENGTH), m_cbHashObject, sizeof_DWORD, m_cbData, 0)
+    m_status = BCryptGetProperty(m_hAlgo, StrPtr(BCRYPT_OBJECT_LENGTH), VarPtr(Value_out), sizeof_DWORD, m_cbData, 0)
     TryGetProperty_ObjectLength = m_status >= STATUS_SUCCESS
-    'If Not TryGetProperty_ObjectLength Then MsgBox ENTSTATUS_ToStr(m_status)
 Catch:
 End Function
 
-Private Function TryGetProperty_HashLength() As Boolean
+Private Function TryGetProperty_HashLength(ByRef Value_out As Long) As Boolean
 Try: On Error GoTo Catch
-    m_status = BCryptGetProperty(m_hAlgo, StrPtr(BCRYPT_HASH_LENGTH), m_pbHash, sizeof_DWORD, m_cbData, 0)
+    '//calculate the length of the hash
+    'if(!NT_SUCCESS(status = BCryptGetProperty( hAlg, BCRYPT_HASH_LENGTH, (PBYTE)&cbHash, sizeof(DWORD), &cbData, 0))) {
+    'm_status = BCryptGetProperty(m_hAlgo, StrPtr(BCRYPT_HASH_LENGTH), m_pbHash, sizeof_DWORD, m_cbData, 0)
+    m_status = BCryptGetProperty(m_hAlgo, StrPtr(BCRYPT_HASH_LENGTH), VarPtr(Value_out), sizeof_DWORD, m_cbData, 0)
     TryGetProperty_HashLength = m_status >= STATUS_SUCCESS
-    'If Not TryGetProperty_HashLength Then MsgBox ENTSTATUS_ToStr(m_status)
 Catch:
 End Function
 
-Private Function TryHeapAlloc() As Boolean
+Private Function TryCreateHash_Handle(ByRef Value_out As LongPtr) As Boolean
 Try: On Error GoTo Catch
-    m_pbHash = HeapAlloc(GetProcessHeap, 0, m_pbHash)
+    m_status = BCryptCreateHash(m_hAlgo, VarPtr(Value_out), ByVal m_pbHashObject, m_cbHashObject, 0, 0, 0)
+    TryCreateHash_Handle = m_status >= STATUS_SUCCESS
+Catch:
+End Function
+
+Private Function TryHashData(ByteBuffer() As Byte) As Boolean
+Try: On Error GoTo Catch
+    Dim lpInput As LongPtr: lpInput = VarPtr(ByteBuffer(0))
+    Dim cbInput As Long:    cbInput = UBound(ByteBuffer) + 1
+    Debug.Print lpInput & " " & cbInput
+    m_status = BCryptHashData(m_hHash, lpInput, cbInput, 0)
+    TryHashData = m_status >= STATUS_SUCCESS
+Catch:
+End Function
+
+Private Function TryFinishHash(HashResult() As Byte) As Boolean
+Try: On Error GoTo Catch
+    m_status = BCryptFinishHash(m_hHash, m_pbHash, m_cbHash, 0)
+    TryFinishHash = m_status >= STATUS_SUCCESS
+    ReDim HashResult(0 To m_cbHash - 1)
+    RtlMoveMemory HashResult(0), ByVal m_pbHash, m_cbHash
 Catch:
 End Function
 
@@ -336,13 +383,13 @@ Private Sub CleanUp()
         MsgBox ENTSTATUS_ToStr(m_status)
         m_status = 0
     End If
-    If m_hAlgo Then
-        BCryptCloseAlgorithmProvider m_hAlgo, 0
-        m_hAlgo = 0
-    End If
     If m_hHash Then
         BCryptDestroyHash m_hHash
         m_hHash = 0
+    End If
+    If m_hAlgo Then
+        BCryptCloseAlgorithmProvider m_hAlgo, 0
+        m_hAlgo = 0
     End If
     If m_pbHashObject Then
         HeapFree GetProcessHeap, 0, m_pbHashObject
@@ -417,11 +464,7 @@ End Function
 '    UNREFERENCED_PARAMETER(wargv);
 '
 '    //open an algorithm handle
-'    if(!NT_SUCCESS(status = BCryptOpenAlgorithmProvider(
-'                                                &hAlg,
-'                                                BCRYPT_SHA256_ALGORITHM,
-'                                                NULL,
-'                                                0)))
+'    if(!NT_SUCCESS(status = BCryptOpenAlgorithmProvider( &hAlg, BCRYPT_SHA256_ALGORITHM, NULL, 0)))
 '    {
 '        wprintf(L"**** Error 0x%x returned by BCryptOpenAlgorithmProvider\n", status);
 '        goto Cleanup;
