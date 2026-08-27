@@ -8,11 +8,11 @@ Option Explicit
 Private Enum ENTSTATUS
 '#define BCRYPT_SUCCESS(Status) (((NTSTATUS)(Status)) >= 0)
     STATUS_SUCCESS = 0          'The function was successful.
-    STATUS_INVALID_HANDLE = &HC0000008 '-1073741816  'The algorithm handle in the hAlgorithm parameter is not valid.
     STATUS_UNSUCCESSFUL = &HC0000001
+    STATUS_INVALID_HANDLE = &HC0000008 '-1073741816  'The algorithm handle in the hAlgorithm parameter is not valid.
+    STATUS_INVALID_PARAMETER = &HC000000D  'One or more parameters are not valid.
     STATUS_BUFFER_TOO_SMALL = &HC0000023    'The size of the hash object specified by the cbHashObject parameter is not large enough to hold the hash object.
     STATUS_NOT_SUPPORTED = &HC00000BB      'The algorithm provider specified by the hAlgorithm parameter does not support the hash or MAC interface.
-    STATUS_INVALID_PARAMETER = &HC000000D  'One or more parameters are not valid.
 End Enum
 'https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptopenalgorithmprovider
 'NTSTATUS BCryptOpenAlgorithmProvider( [out] BCRYPT_ALG_HANDLE *phAlgorithm, [in]  LPCWSTR           pszAlgId, [in]  LPCWSTR           pszImplementation, [in]  ULONG dwFlags);
@@ -26,7 +26,6 @@ Private Declare Function BCryptCloseAlgorithmProvider Lib "BCrypt" (ByVal hAlgor
 'NTSTATUS BCryptGetProperty( [in] BCRYPT_HANDLE hObject, [in] LPCWSTR pszProperty, [out] PUCHAR pbOutput, [in] ULONG cbOutput, [out] ULONG *pcbResult, [in] ULONG dwFlags);
 'Private Declare Function BCryptGetProperty Lib "BCrypt" (ByVal hObject As LongPtr, ByVal pszProperty As LongPtr, ByRef pbOutput_out As LongPtr, ByVal cbOutput As Long, ByRef pcbResult_out As Long, ByVal dwFlags As Long) As ENTSTATUS
 Private Declare Function BCryptGetProperty Lib "BCrypt" (ByVal hObject As LongPtr, ByVal pszProperty As LongPtr, ByVal pbOutput_out As LongPtr, ByVal cbOutput As Long, ByRef pcbResult_out As Long, ByVal dwFlags As Long) As ENTSTATUS
-
 'Private Declare Function BCryptGetProperty Lib "BCrypt" (ByVal hObject As LongPtr, ByVal pszProperty As LongPtr, ByVal pbOutput_out As LONG_PTR, ByVal cbOutput As Long, ByRef pcbResult_out As Long, ByVal dwFlags As Long) As ENTSTATUS
 'LONG_PTR??
 
@@ -139,42 +138,42 @@ Private Const BCRYPT_KMAC256_ALGORITHM            As String = "KMAC256"
 '//
 '// Interfaces
 '//
-Private Const BCRYPT_CIPHER_INTERFACE                As Long = &H1
-Private Const BCRYPT_HASH_INTERFACE                  As Long = &H2
+Private Const BCRYPT_CIPHER_INTERFACE             As Long = &H1
+Private Const BCRYPT_HASH_INTERFACE               As Long = &H2
 Private Const BCRYPT_ASYMMETRIC_ENCRYPTION_INTERFACE As Long = &H3
-Private Const BCRYPT_SECRET_AGREEMENT_INTERFACE      As Long = &H4
-Private Const BCRYPT_SIGNATURE_INTERFACE             As Long = &H5
-Private Const BCRYPT_RNG_INTERFACE                   As Long = &H6
+Private Const BCRYPT_SECRET_AGREEMENT_INTERFACE   As Long = &H4
+Private Const BCRYPT_SIGNATURE_INTERFACE          As Long = &H5
+Private Const BCRYPT_RNG_INTERFACE                As Long = &H6
 
 '#if (NTDDI_VERSION >= NTDDI_WIN8)
-Private Const BCRYPT_KEY_DERIVATION_INTERFACE        As Long = &H7
+Private Const BCRYPT_KEY_DERIVATION_INTERFACE     As Long = &H7
 '#End If
 
-Private Const KDF_HASH_ALGORITHM                     As Long = &H0
-Private Const KDF_SECRET_PREPEND                     As Long = &H1
-Private Const KDF_SECRET_APPEND                      As Long = &H2
-Private Const KDF_HMAC_KEY                           As Long = &H3
-Private Const KDF_TLS_PRF_LABEL                      As Long = &H4
-Private Const KDF_TLS_PRF_SEED                       As Long = &H5
-Private Const KDF_SECRET_HANDLE                      As Long = &H6
+Private Const KDF_HASH_ALGORITHM                  As Long = &H0
+Private Const KDF_SECRET_PREPEND                  As Long = &H1
+Private Const KDF_SECRET_APPEND                   As Long = &H2
+Private Const KDF_HMAC_KEY                        As Long = &H3
+Private Const KDF_TLS_PRF_LABEL                   As Long = &H4
+Private Const KDF_TLS_PRF_SEED                    As Long = &H5
+Private Const KDF_SECRET_HANDLE                   As Long = &H6
 
 '#if (NTDDI_VERSION >= NTDDI_WIN7)
-Private Const KDF_TLS_PRF_PROTOCOL                   As Long = &H7
-Private Const KDF_ALGORITHMID                        As Long = &H8
-Private Const KDF_PARTYUINFO                         As Long = &H9
-Private Const KDF_PARTYVINFO                         As Long = &HA
-Private Const KDF_SUPPPUBINFO                        As Long = &HB
-Private Const KDF_SUPPPRIVINFO                       As Long = &HC
+Private Const KDF_TLS_PRF_PROTOCOL                As Long = &H7
+Private Const KDF_ALGORITHMID                     As Long = &H8
+Private Const KDF_PARTYUINFO                      As Long = &H9
+Private Const KDF_PARTYVINFO                      As Long = &HA
+Private Const KDF_SUPPPUBINFO                     As Long = &HB
+Private Const KDF_SUPPPRIVINFO                    As Long = &HC
 
-Private Const KDF_LABEL                              As Long = &HD
-Private Const KDF_CONTEXT                            As Long = &HE
-Private Const KDF_SALT                               As Long = &HF
+Private Const KDF_LABEL                           As Long = &HD
+Private Const KDF_CONTEXT                         As Long = &HE
+Private Const KDF_SALT                            As Long = &HF
 
-Private Const KDF_ITERATION_COUNT                    As Long = &H10
+Private Const KDF_ITERATION_COUNT                 As Long = &H10
 
-Private Const KDF_KEYBITLENGTH                       As Long = &H12
-Private Const KDF_HKDF_SALT                          As Long = &H13 ' This is used only for testing purposes
-Private Const KDF_HKDF_INFO                          As Long = &H14
+Private Const KDF_KEYBITLENGTH                    As Long = &H12
+Private Const KDF_HKDF_SALT                       As Long = &H13 ' This is used only for testing purposes
+Private Const KDF_HKDF_INFO                       As Long = &H14
 
 '// BCryptGetProperty strings
 Private Const BCRYPT_OBJECT_LENGTH        As String = "ObjectLength"
@@ -237,11 +236,10 @@ Private m_pbHashObject As LongPtr   'PBYTE              pbHashObject = NULL;
 Private m_cbHash       As Long      'DWORD              cbHash       = 0;
 Private m_pbHash       As LongPtr   'PBYTE              pbHash       = NULL;
 Private m_cbData       As Long      'DWORD              cbData       = 0;
-    
 
 Public Function TryGetHash(Bytes() As Byte) As Byte()
     
-    'open an algorithm handle
+    'open a handle to an algorithm provider
     If Not TryGetAlgorithmProvider(m_hAlgo) Then
         MsgBox "**** Error " & m_status & " returned by BCryptOpenAlgorithmProvider"
         Call CleanUp: Exit Function
@@ -293,30 +291,12 @@ Public Function TryGetHash(Bytes() As Byte) As Byte()
         Call CleanUp: Exit Function
     End If
     
-    'm_status = BCryptHashData(m_hHash, m_pbHashObject, m_cbHashObject, 0)
-    'Dim lpInput As LongPtr: lpInput = VarPtr(Bytes(0))
-    'Dim cbInput As Long:    cbInput = UBound(Bytes) + 1
-    'Debug.Print lpInput & " " & cbInput
-    'm_status = BCryptHashData(m_hHash, lpInput, cbInput, 0)
-    'If Not (m_status >= STATUS_SUCCESS) Then
-    '    MsgBox "**** Error " & Hex(m_status) & " returned by BCryptHashData" & vbCrLf & MErr.WinApiError_ToStr(m_status)
-    '    Call CleanUp: Exit Function
-    'End If
-    
+    '//close the hash
     Dim HashBytes() As Byte
     If Not TryFinishHash(HashBytes) Then
         MsgBox "**** Error " & Hex(m_status) & " returned by BCryptFinishHash" & vbCrLf & MErr.WinApiError_ToStr(m_status)
         Call CleanUp: Exit Function
     End If
-    ' close the hash
-    'm_status = BCryptFinishHash(m_hHash, m_pbHash, m_cbHash, 0)
-    'If Not (m_status <> STATUS_SUCCESS) Then
-    '    MsgBox "**** Error " & Hex(m_status) & " returned by BCryptFinishHash" & vbCrLf & MErr.WinApiError_ToStr(m_status)
-    '    Call CleanUp: Exit Function
-    'End If
-    
-    
-    'RtlMoveMemory HashBytes(0), ByVal m_pbHash, m_cbHash
     
     TryGetHash = HashBytes
     

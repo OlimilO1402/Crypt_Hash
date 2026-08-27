@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin VB.Form FMain 
    Caption         =   "CryptHash"
-   ClientHeight    =   5865
+   ClientHeight    =   6870
    ClientLeft      =   120
    ClientTop       =   465
-   ClientWidth     =   10455
+   ClientWidth     =   11655
    BeginProperty Font 
       Name            =   "Segoe UI"
       Size            =   9.75
@@ -17,9 +17,34 @@ Begin VB.Form FMain
    Icon            =   "FMain.frx":0000
    LinkTopic       =   "Form1"
    OLEDropMode     =   1  'Manuell
-   ScaleHeight     =   5865
-   ScaleWidth      =   10455
+   ScaleHeight     =   6870
+   ScaleWidth      =   11655
    StartUpPosition =   3  'Windows-Standard
+   Begin VB.ComboBox Combo1 
+      Height          =   375
+      Left            =   1920
+      TabIndex        =   27
+      Text            =   "Combo1"
+      Top             =   5520
+      Width           =   1815
+   End
+   Begin VB.CommandButton Command1 
+      Caption         =   "BCrypt select:"
+      BeginProperty Font 
+         Name            =   "Segoe UI"
+         Size            =   9
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      Height          =   375
+      Left            =   0
+      TabIndex        =   26
+      Top             =   5520
+      Width           =   1935
+   End
    Begin VB.TextBox TxtBCryptSHA512 
       BeginProperty Font 
          Name            =   "Consolas"
@@ -481,7 +506,6 @@ Option Explicit
 'CRC = Cyclic Redundancy Check
 'https://de.wikipedia.org/wiki/Zyklische_Redundanzpr%C3%BCfung
 'https://en.wikipedia.org/wiki/Cyclic_redundancy_check
-
 'MD5 = Message Digest Algorithm 5
 'https://en.wikipedia.org/wiki/MD5
 'https://de.wikipedia.org/wiki/Message-Digest_Algorithm_5
@@ -501,11 +525,14 @@ Option Explicit
 'BCrypt.SHA256 = &HC6E68384699D2E81C02D4C3EEC53CEDE3EA420C1AE8A227DAC495AA00666FD13
 'BCrypt.SHA384 = &H29713F65A24E97E66DA57499723359374326DD1498C9A26FDA84396A7A7D0A24C56A50343F5E0228778EA7BD53F9A179
 'BCrypt.SHA512 = &H12a98085e307959d5d6e6d0ed361845b604a33f9b66d025f30cc0414d2fa374ea129e6e80a838dffc07e2334e9936119d5bb18443d3ecde58a2f1ec4306e6fb2
-
+Private m_PFN As String
+Private m_FilBuf() As Byte
 
 Private Sub Form_Load()
     TxtUserText.text = "The Quick Brown Fox Jumps Over The Lazy Dog"
     Me.Caption = Me.Caption & " v" & App.Major & "." & App.Minor & "." & App.Revision
+    Dim bcr As New MSBCrypt
+    bcr.HashAlgos_ToCBLB Combo1
 End Sub
 
 Private Sub Form_Resize()
@@ -539,6 +566,13 @@ Private Sub Form_Resize()
     If W > 0 And H > 0 Then TxtBCryptSHA512.Move l, t, W, H
 End Sub
 
+Private Sub Command1_Click()
+    Dim HashAlgo As MSBCrypt: Set HashAlgo = MNew.MSBCrypt(EBCryptHashAlgo.ha_SHA384)
+    HashAlgo.HashData m_FilBuf
+    TxtBCryptSHA512.text = Hex_ToStr(HashAlgo.Finish)
+    MsgBox HashAlgo.ToStr
+End Sub
+
 Private Sub LBLDragDropFileCRC32_OLEDragDrop(Data As DataObject, Effect As Long, Button As Integer, Shift As Integer, x As Single, y As Single)
     OnOLEDragDrop Data, Effect, Button, Shift, x, y
 End Sub
@@ -547,17 +581,28 @@ Private Sub Form_OLEDragDrop(Data As DataObject, Effect As Long, Button As Integ
 End Sub
 
 Private Sub OnOLEDragDrop(Data As DataObject, Effect As Long, Button As Integer, Shift As Integer, x As Single, y As Single)
+    Dim dt As Single: dt = Timer
     If Not Data.GetFormat(ClipBoardConstants.vbCFFiles) Then Exit Sub
-    Dim PFN As String: PFN = Data.Files(1)
-    Dim Value() As Byte: Value = GetFileBuffer(PFN)
-    TxtCRC32JAM.text = GetHashString(MNew.CRC32(ECRC32Algo.CRC32_JAMCRC), Value)
-    TxtCRC32MEF.text = GetHashString(MNew.CRC32(ECRC32Algo.CRC32_MEF), Value)
-    TxtMSCryptRC4.text = GetHashString(MNew.MSCrypt(ECryptHashAlgo.ha_RC4), Value)
-    TxtMSCryptMD5.text = GetHashString(MNew.MSCrypt(ECryptHashAlgo.ha_MD5), Value)
-    TxtMSCryptSHA.text = GetHashString(MNew.MSCrypt(ECryptHashAlgo.ha_SHA), Value)
-    TxtBCryptSHA256.text = GetHashString(MNew.MSBCrypt(EBCryptHashAlgo.ha_SHA256), Value)
-    'TxtBCryptSHA384.text = GetHashString(MNew.MSBCrypt(EBCryptHashAlgo.ha_SHA384), Value)
-    'TxtBCryptSHA512.text = GetHashString(MNew.MSBCrypt(EBCryptHashAlgo.ha_SHA512), Value)
+    'Dim PFN As String:
+    m_PFN = Data.Files(1)
+    'Dim Value() As Byte: Value = GetFileBuffer(PFN)
+    m_FilBuf = GetFileBuffer(m_PFN)
+    'dt = Timer - dt:    MsgBox "GetFileBuffer: " & dt & " sec":     dt = Timer
+    TxtCRC32JAM.text = GetHashString(MNew.CRC32(ECRC32Algo.CRC32_JAMCRC), m_FilBuf)
+    'dt = Timer - dt:    MsgBox "CRC32_JAMCRC: " & dt & " sec":     dt = Timer
+    TxtCRC32MEF.text = GetHashString(MNew.CRC32(ECRC32Algo.CRC32_MEF), m_FilBuf)
+    'dt = Timer - dt:    MsgBox "CRC32_MEF: " & dt & " sec":     dt = Timer
+    TxtMSCryptRC4.text = GetHashString(MNew.MSCrypt(ECryptHashAlgo.ha_RC4), m_FilBuf)
+    'dt = Timer - dt:    MsgBox "HashAlgo RC4: " & dt & " sec":     dt = Timer
+    TxtMSCryptMD5.text = GetHashString(MNew.MSCrypt(ECryptHashAlgo.ha_MD5), m_FilBuf)
+    'dt = Timer - dt:    MsgBox "HashAlgo MD5: " & dt & " sec":     dt = Timer
+    TxtMSCryptSHA.text = GetHashString(MNew.MSCrypt(ECryptHashAlgo.ha_SHA), m_FilBuf)
+    'dt = Timer - dt:    MsgBox "HashAlgo SHA: " & dt & " sec":     dt = Timer
+    TxtBCryptSHA256.text = GetHashString(MNew.MSBCrypt(EBCryptHashAlgo.ha_SHA256), m_FilBuf)
+    'dt = Timer - dt:    MsgBox "HashAlgo SHA256: " & dt & " sec":     dt = Timer
+    TxtBCryptSHA384.text = GetHashString(MNew.MSBCrypt(EBCryptHashAlgo.ha_SHA384), m_FilBuf)
+    'dt = Timer - dt:    MsgBox "HashAlgo SHA256: " & dt & " sec":     dt = Timer
+    TxtBCryptSHA512.text = GetHashString(MNew.MSBCrypt(EBCryptHashAlgo.ha_SHA512), m_FilBuf)
 End Sub
 
 Function GetFileBuffer(PFN As String) As Byte()
