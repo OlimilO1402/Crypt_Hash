@@ -14,50 +14,64 @@ Private Enum ENTSTATUS
     STATUS_BUFFER_TOO_SMALL = &HC0000023    'The size of the hash object specified by the cbHashObject parameter is not large enough to hold the hash object.
     STATUS_NOT_SUPPORTED = &HC00000BB      'The algorithm provider specified by the hAlgorithm parameter does not support the hash or MAC interface.
 End Enum
-'https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptopenalgorithmprovider
-'NTSTATUS BCryptOpenAlgorithmProvider( [out] BCRYPT_ALG_HANDLE *phAlgorithm, [in]  LPCWSTR           pszAlgId, [in]  LPCWSTR           pszImplementation, [in]  ULONG dwFlags);
-Private Declare Function BCryptOpenAlgorithmProvider Lib "BCrypt" (ByRef phAlgorithm_out As LongPtr, ByVal pszAlgId As LongPtr, ByVal pszImplementation As LongPtr, ByVal dwFlags As Long) As ENTSTATUS
 
-'https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptclosealgorithmprovider
-'NTSTATUS BCryptCloseAlgorithmProvider( [in, out] BCRYPT_ALG_HANDLE hAlgorithm, [in] ULONG dwFlags);
-Private Declare Function BCryptCloseAlgorithmProvider Lib "BCrypt" (ByVal hAlgorithm As LongPtr, ByVal dwFlags As Long) As ENTSTATUS
-
-'https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptgetproperty
-'NTSTATUS BCryptGetProperty( [in] BCRYPT_HANDLE hObject, [in] LPCWSTR pszProperty, [out] PUCHAR pbOutput, [in] ULONG cbOutput, [out] ULONG *pcbResult, [in] ULONG dwFlags);
-'Private Declare Function BCryptGetProperty Lib "BCrypt" (ByVal hObject As LongPtr, ByVal pszProperty As LongPtr, ByRef pbOutput_out As LongPtr, ByVal cbOutput As Long, ByRef pcbResult_out As Long, ByVal dwFlags As Long) As ENTSTATUS
-Private Declare Function BCryptGetProperty Lib "BCrypt" (ByVal hObject As LongPtr, ByVal pszProperty As LongPtr, ByVal pbOutput_out As LongPtr, ByVal cbOutput As Long, ByRef pcbResult_out As Long, ByVal dwFlags As Long) As ENTSTATUS
-'Private Declare Function BCryptGetProperty Lib "BCrypt" (ByVal hObject As LongPtr, ByVal pszProperty As LongPtr, ByVal pbOutput_out As LONG_PTR, ByVal cbOutput As Long, ByRef pcbResult_out As Long, ByVal dwFlags As Long) As ENTSTATUS
-'LONG_PTR??
-
-'https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptcreatehash
-'NTSTATUS BCryptCreateHash([in, out] BCRYPT_ALG_HANDLE hAlgorithm, [out] BCRYPT_HASH_HANDLE *phHash, [out] PUCHAR pbHashObject, [in, optional] ULONG cbHashObject, [in, optional] PUCHAR pbSecret, [in] ULONG cbSecret, [in] ULONG dwFlags);
-'Private Declare Function BCryptCreateHash Lib "BCrypt" (ByVal hAlgorithm_inout As LongPtr, ByRef phHash_out As LongPtr, ByRef pbHashObject_out As LongPtr, ByVal cbHashObject As Long, ByVal pbSecret As Long, ByVal cbSecret As Long, ByVal dwFlags As Long) As ENTSTATUS
-Private Declare Function BCryptCreateHash Lib "BCrypt" (ByVal hAlgorithm_inout As LongPtr, ByVal phHash_out As LongPtr, ByRef pbHashObject_out As LongPtr, ByVal cbHashObject As Long, ByVal pbSecret As Long, ByVal cbSecret As Long, ByVal dwFlags As Long) As ENTSTATUS
-
-'https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcrypthashdata
-'NTSTATUS BCryptHashData([in, out] BCRYPT_HASH_HANDLE hHash, [in] PUCHAR pbInput, [in] ULONG cbInput, [in] ULONG dwFlags);
-Private Declare Function BCryptHashData Lib "BCrypt" (ByVal hHash_inout As LongPtr, ByVal pbInput As LongPtr, ByVal cbInput As Long, ByVal dwFlags As Long) As ENTSTATUS
-
-'https://learn.microsoft.com/de-de/windows/win32/api/bcrypt/nf-bcrypt-bcryptfinishhash
-'NTSTATUS BCryptFinishHash([in, out] BCRYPT_HASH_HANDLE hHash, [out] PUCHAR pbOutput, [in] ULONG cbOutput, [in] ULONG dwFlags);
-Private Declare Function BCryptFinishHash Lib "BCrypt" (ByVal hHash_inout As LongPtr, ByVal pbOutput As LongPtr, ByVal cbOutput As Long, ByVal dwFlags As Long) As ENTSTATUS
-
-'https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptdestroyhash
-'NTSTATUS BCryptDestroyHash( [in, out] BCRYPT_HASH_HANDLE hHash );
-Private Declare Function BCryptDestroyHash Lib "BCrypt" (ByVal hHash As LongPtr) As ENTSTATUS
-
-'https://learn.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapalloc
-'DECLSPEC_ALLOCATOR LPVOID HeapAlloc( [in] HANDLE hHeap, [in] DWORD dwFlags, [in] SIZE_T dwBytes);
-Private Declare Function HeapAlloc Lib "kernel32" (ByVal hHeap As LongPtr, ByVal dwFlags As Long, ByVal dwBytes As Long) As LongPtr
-'Private Declare Function HeapAlloc Lib "kernel32" (ByVal hHeap As LongPtr, ByVal dwFlags As Long, ByVal dwBytes As LongPtr) As LongPtr
-
-'https://learn.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-getprocessheap
-'HANDLE GetProcessHeap();
-Private Declare Function GetProcessHeap Lib "kernel32" () As LongPtr
-
-'https://learn.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapfree
-'BOOL HeapFree( [in] HANDLE hHeap, [in] DWORD dwFlags, [in] _Frees_ptr_opt_ LPVOID lpMem);
-Private Declare Function HeapFree Lib "kernel32" (ByVal hHeap As LongPtr, ByVal dwFlags As Long, ByVal lpMem As LongPtr) As Long
+#If VBA7 Then
+    Private Declare PtrSafe Function BCryptOpenAlgorithmProvider Lib "BCrypt" (ByRef phAlgorithm_out As LongPtr, ByVal pszAlgId As LongPtr, ByVal pszImplementation As LongPtr, ByVal dwFlags As Long) As ENTSTATUS
+    Private Declare PtrSafe Function BCryptCloseAlgorithmProvider Lib "BCrypt" (ByVal hAlgorithm As LongPtr, ByVal dwFlags As Long) As ENTSTATUS
+    Private Declare PtrSafe Function BCryptGetProperty Lib "BCrypt" (ByVal hObject As LongPtr, ByVal pszProperty As LongPtr, ByVal pbOutput_out As LongPtr, ByVal cbOutput As Long, ByRef pcbResult_out As Long, ByVal dwFlags As Long) As ENTSTATUS
+    Private Declare PtrSafe Function BCryptCreateHash Lib "BCrypt" (ByVal hAlgorithm_inout As LongPtr, ByVal phHash_out As LongPtr, ByRef pbHashObject_out As LongPtr, ByVal cbHashObject As Long, ByVal pbSecret As Long, ByVal cbSecret As Long, ByVal dwFlags As Long) As ENTSTATUS
+    Private Declare PtrSafe Function BCryptHashData Lib "BCrypt" (ByVal hHash_inout As LongPtr, ByVal pbInput As LongPtr, ByVal cbInput As Long, ByVal dwFlags As Long) As ENTSTATUS
+    Private Declare PtrSafe Function BCryptFinishHash Lib "BCrypt" (ByVal hHash_inout As LongPtr, ByVal pbOutput As LongPtr, ByVal cbOutput As Long, ByVal dwFlags As Long) As ENTSTATUS
+    Private Declare PtrSafe Function BCryptDestroyHash Lib "BCrypt" (ByVal hHash As LongPtr) As ENTSTATUS
+    Private Declare PtrSafe Function HeapAlloc Lib "kernel32" (ByVal hHeap As LongPtr, ByVal dwFlags As Long, ByVal dwBytes As Long) As LongPtr
+    Private Declare PtrSafe Function GetProcessHeap Lib "kernel32" () As LongPtr
+    Private Declare PtrSafe Function HeapFree Lib "kernel32" (ByVal hHeap As LongPtr, ByVal dwFlags As Long, ByVal lpMem As LongPtr) As Long
+#Else
+    'https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptopenalgorithmprovider
+    'NTSTATUS BCryptOpenAlgorithmProvider( [out] BCRYPT_ALG_HANDLE *phAlgorithm, [in]  LPCWSTR           pszAlgId, [in]  LPCWSTR           pszImplementation, [in]  ULONG dwFlags);
+    Private Declare Function BCryptOpenAlgorithmProvider Lib "BCrypt" (ByRef phAlgorithm_out As LongPtr, ByVal pszAlgId As LongPtr, ByVal pszImplementation As LongPtr, ByVal dwFlags As Long) As ENTSTATUS
+    
+    'https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptclosealgorithmprovider
+    'NTSTATUS BCryptCloseAlgorithmProvider( [in, out] BCRYPT_ALG_HANDLE hAlgorithm, [in] ULONG dwFlags);
+    Private Declare Function BCryptCloseAlgorithmProvider Lib "BCrypt" (ByVal hAlgorithm As LongPtr, ByVal dwFlags As Long) As ENTSTATUS
+    
+    'https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptgetproperty
+    'NTSTATUS BCryptGetProperty( [in] BCRYPT_HANDLE hObject, [in] LPCWSTR pszProperty, [out] PUCHAR pbOutput, [in] ULONG cbOutput, [out] ULONG *pcbResult, [in] ULONG dwFlags);
+    'Private Declare Function BCryptGetProperty Lib "BCrypt" (ByVal hObject As LongPtr, ByVal pszProperty As LongPtr, ByRef pbOutput_out As LongPtr, ByVal cbOutput As Long, ByRef pcbResult_out As Long, ByVal dwFlags As Long) As ENTSTATUS
+    Private Declare Function BCryptGetProperty Lib "BCrypt" (ByVal hObject As LongPtr, ByVal pszProperty As LongPtr, ByVal pbOutput_out As LongPtr, ByVal cbOutput As Long, ByRef pcbResult_out As Long, ByVal dwFlags As Long) As ENTSTATUS
+    'Private Declare Function BCryptGetProperty Lib "BCrypt" (ByVal hObject As LongPtr, ByVal pszProperty As LongPtr, ByVal pbOutput_out As LONG_PTR, ByVal cbOutput As Long, ByRef pcbResult_out As Long, ByVal dwFlags As Long) As ENTSTATUS
+    'LONG_PTR??
+    
+    'https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptcreatehash
+    'NTSTATUS BCryptCreateHash([in, out] BCRYPT_ALG_HANDLE hAlgorithm, [out] BCRYPT_HASH_HANDLE *phHash, [out] PUCHAR pbHashObject, [in, optional] ULONG cbHashObject, [in, optional] PUCHAR pbSecret, [in] ULONG cbSecret, [in] ULONG dwFlags);
+    'Private Declare Function BCryptCreateHash Lib "BCrypt" (ByVal hAlgorithm_inout As LongPtr, ByRef phHash_out As LongPtr, ByRef pbHashObject_out As LongPtr, ByVal cbHashObject As Long, ByVal pbSecret As Long, ByVal cbSecret As Long, ByVal dwFlags As Long) As ENTSTATUS
+    Private Declare Function BCryptCreateHash Lib "BCrypt" (ByVal hAlgorithm_inout As LongPtr, ByVal phHash_out As LongPtr, ByRef pbHashObject_out As LongPtr, ByVal cbHashObject As Long, ByVal pbSecret As Long, ByVal cbSecret As Long, ByVal dwFlags As Long) As ENTSTATUS
+    
+    'https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcrypthashdata
+    'NTSTATUS BCryptHashData([in, out] BCRYPT_HASH_HANDLE hHash, [in] PUCHAR pbInput, [in] ULONG cbInput, [in] ULONG dwFlags);
+    Private Declare Function BCryptHashData Lib "BCrypt" (ByVal hHash_inout As LongPtr, ByVal pbInput As LongPtr, ByVal cbInput As Long, ByVal dwFlags As Long) As ENTSTATUS
+    
+    'https://learn.microsoft.com/de-de/windows/win32/api/bcrypt/nf-bcrypt-bcryptfinishhash
+    'NTSTATUS BCryptFinishHash([in, out] BCRYPT_HASH_HANDLE hHash, [out] PUCHAR pbOutput, [in] ULONG cbOutput, [in] ULONG dwFlags);
+    Private Declare Function BCryptFinishHash Lib "BCrypt" (ByVal hHash_inout As LongPtr, ByVal pbOutput As LongPtr, ByVal cbOutput As Long, ByVal dwFlags As Long) As ENTSTATUS
+    
+    'https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptdestroyhash
+    'NTSTATUS BCryptDestroyHash( [in, out] BCRYPT_HASH_HANDLE hHash );
+    Private Declare Function BCryptDestroyHash Lib "BCrypt" (ByVal hHash As LongPtr) As ENTSTATUS
+    
+    'https://learn.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapalloc
+    'DECLSPEC_ALLOCATOR LPVOID HeapAlloc( [in] HANDLE hHeap, [in] DWORD dwFlags, [in] SIZE_T dwBytes);
+    Private Declare Function HeapAlloc Lib "kernel32" (ByVal hHeap As LongPtr, ByVal dwFlags As Long, ByVal dwBytes As Long) As LongPtr
+    'Private Declare Function HeapAlloc Lib "kernel32" (ByVal hHeap As LongPtr, ByVal dwFlags As Long, ByVal dwBytes As LongPtr) As LongPtr
+    
+    'https://learn.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-getprocessheap
+    'HANDLE GetProcessHeap();
+    Private Declare Function GetProcessHeap Lib "kernel32" () As LongPtr
+    
+    'https://learn.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapfree
+    'BOOL HeapFree( [in] HANDLE hHeap, [in] DWORD dwFlags, [in] _Frees_ptr_opt_ LPVOID lpMem);
+    Private Declare Function HeapFree Lib "kernel32" (ByVal hHeap As LongPtr, ByVal dwFlags As Long, ByVal lpMem As LongPtr) As Long
+#End If
 
 Private Const BCRYPT_KDF_HASH                    As String = "HASH"
 Private Const BCRYPT_KDF_HMAC                    As String = "HMAC"

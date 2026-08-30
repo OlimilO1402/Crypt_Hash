@@ -3,7 +3,7 @@
 
 [![GitHub](https://img.shields.io/github/license/OlimilO1402/Crypt_Hash?style=plastic)](https://github.com/OlimilO1402/Crypt_Hash/blob/master/LICENSE) 
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/OlimilO1402/Crypt_Hash?style=plastic)](https://github.com/OlimilO1402/Crypt_Hash/releases/latest)
-[![Github All Releases](https://img.shields.io/github/downloads/OlimilO1402/Crypt_Hash/total.svg)](https://github.com/OlimilO1402/Crypt_Hash/releases/download/v2024.9.14/CryptHash_v2024.9.14.zip)
+[![Github All Releases](https://img.shields.io/github/downloads/OlimilO1402/Crypt_Hash/total.svg)](https://github.com/OlimilO1402/Crypt_Hash/releases/download/v2026.08.30/CryptHash_v2026.08.30.zip)
 ![GitHub followers](https://img.shields.io/github/followers/OlimilO1402?style=social)
 
 

@@ -4,7 +4,7 @@ Begin VB.Form FMain
    ClientHeight    =   6870
    ClientLeft      =   120
    ClientTop       =   465
-   ClientWidth     =   11655
+   ClientWidth     =   17670
    BeginProperty Font 
       Name            =   "Segoe UI"
       Size            =   9.75
@@ -18,9 +18,9 @@ Begin VB.Form FMain
    LinkTopic       =   "Form1"
    OLEDropMode     =   1  'Manuell
    ScaleHeight     =   6870
-   ScaleWidth      =   11655
+   ScaleWidth      =   17670
    StartUpPosition =   3  'Windows-Standard
-   Begin VB.ComboBox Combo1 
+   Begin VB.ComboBox CmbBCryptHashAlgos 
       Height          =   375
       Left            =   1920
       TabIndex        =   27
@@ -28,7 +28,26 @@ Begin VB.Form FMain
       Top             =   5520
       Width           =   1815
    End
-   Begin VB.CommandButton Command1 
+   Begin VB.TextBox TxtBCryptSelect 
+      BeginProperty Font 
+         Name            =   "Consolas"
+         Size            =   9.75
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      Height          =   810
+      Left            =   3720
+      MultiLine       =   -1  'True
+      ScrollBars      =   3  'Beides
+      TabIndex        =   28
+      Text            =   "FMain.frx":1782
+      Top             =   5520
+      Width           =   6735
+   End
+   Begin VB.CommandButton BtnBCryptSelect 
       Caption         =   "BCrypt select:"
       BeginProperty Font 
          Name            =   "Segoe UI"
@@ -55,12 +74,11 @@ Begin VB.Form FMain
          Italic          =   0   'False
          Strikethrough   =   0   'False
       EndProperty
-      Height          =   810
+      Height          =   450
       Left            =   3720
       MultiLine       =   -1  'True
-      ScrollBars      =   3  'Beides
       TabIndex        =   25
-      Text            =   "FMain.frx":1782
+      Text            =   "FMain.frx":1786
       Top             =   5040
       Width           =   6735
    End
@@ -78,7 +96,7 @@ Begin VB.Form FMain
       Left            =   3720
       MultiLine       =   -1  'True
       TabIndex        =   22
-      Text            =   "FMain.frx":1786
+      Text            =   "FMain.frx":178A
       Top             =   4560
       Width           =   6735
    End
@@ -96,7 +114,7 @@ Begin VB.Form FMain
       Left            =   3720
       MultiLine       =   -1  'True
       TabIndex        =   19
-      Text            =   "FMain.frx":178A
+      Text            =   "FMain.frx":178E
       Top             =   4080
       Width           =   6735
    End
@@ -114,7 +132,7 @@ Begin VB.Form FMain
       Left            =   3720
       MultiLine       =   -1  'True
       TabIndex        =   16
-      Text            =   "FMain.frx":178E
+      Text            =   "FMain.frx":1792
       Top             =   3600
       Width           =   6735
    End
@@ -132,7 +150,7 @@ Begin VB.Form FMain
       Left            =   3720
       MultiLine       =   -1  'True
       TabIndex        =   13
-      Text            =   "FMain.frx":1792
+      Text            =   "FMain.frx":1796
       Top             =   3120
       Width           =   6735
    End
@@ -150,7 +168,7 @@ Begin VB.Form FMain
       Left            =   3720
       MultiLine       =   -1  'True
       TabIndex        =   10
-      Text            =   "FMain.frx":1796
+      Text            =   "FMain.frx":179A
       Top             =   2640
       Width           =   6735
    End
@@ -168,7 +186,7 @@ Begin VB.Form FMain
       Left            =   3720
       MultiLine       =   -1  'True
       TabIndex        =   7
-      Text            =   "FMain.frx":179A
+      Text            =   "FMain.frx":179E
       Top             =   2160
       Width           =   6735
    End
@@ -186,7 +204,7 @@ Begin VB.Form FMain
       Left            =   3720
       MultiLine       =   -1  'True
       TabIndex        =   4
-      Text            =   "FMain.frx":179E
+      Text            =   "FMain.frx":17A2
       Top             =   1680
       Width           =   6735
    End
@@ -443,7 +461,7 @@ Begin VB.Form FMain
    End
    Begin VB.Label LBLDragDropFileCRC32 
       Alignment       =   2  'Zentriert
-      Caption         =   "Drag'n'drop file here, checksum-hash will be calculated!"
+      Caption         =   "Drag'n'drop file here, all hashes will be calculated!"
       BeginProperty Font 
          Name            =   "Segoe UI"
          Size            =   9
@@ -527,12 +545,14 @@ Option Explicit
 'BCrypt.SHA512 = &H12a98085e307959d5d6e6d0ed361845b604a33f9b66d025f30cc0414d2fa374ea129e6e80a838dffc07e2334e9936119d5bb18443d3ecde58a2f1ec4306e6fb2
 Private m_PFN As String
 Private m_FilBuf() As Byte
+Private MSBCrypt As MSBCrypt
 
 Private Sub Form_Load()
     TxtUserText.text = "The Quick Brown Fox Jumps Over The Lazy Dog"
     Me.Caption = Me.Caption & " v" & App.Major & "." & App.Minor & "." & App.Revision
-    Dim bcr As New MSBCrypt
-    bcr.HashAlgos_ToCBLB Combo1
+    Set MSBCrypt = New MSBCrypt
+    MSBCrypt.HashAlgos_ToCBLB CmbBCryptHashAlgos
+    CmbBCryptHashAlgos.ListIndex = EBCryptHashAlgo.ha_SHA256 - 1
 End Sub
 
 Private Sub Form_Resize()
@@ -562,15 +582,10 @@ Private Sub Form_Resize()
     t = TxtBCryptSHA384.Top
     If W > 0 And H > 0 Then TxtBCryptSHA384.Move l, t, W, H
     t = TxtBCryptSHA512.Top
-    H = Me.ScaleHeight - t
     If W > 0 And H > 0 Then TxtBCryptSHA512.Move l, t, W, H
-End Sub
-
-Private Sub Command1_Click()
-    Dim HashAlgo As MSBCrypt: Set HashAlgo = MNew.MSBCrypt(EBCryptHashAlgo.ha_SHA384)
-    HashAlgo.HashData m_FilBuf
-    TxtBCryptSHA512.text = Hex_ToStr(HashAlgo.Finish)
-    MsgBox HashAlgo.ToStr
+    t = TxtBCryptSelect.Top
+    H = Me.ScaleHeight - t
+    If W > 0 And H > 0 Then TxtBCryptSelect.Move l, t, W, H
 End Sub
 
 Private Sub LBLDragDropFileCRC32_OLEDragDrop(Data As DataObject, Effect As Long, Button As Integer, Shift As Integer, x As Single, y As Single)
@@ -665,9 +680,18 @@ Private Sub BtnBCryptSHA256_Click()
 End Sub
 
 Private Sub BtnBCryptSHA384_Click()
-    TxtBCryptSHA256.text = GetHashString(MNew.MSBCrypt(EBCryptHashAlgo.ha_SHA384), GetValueFromUserInput)
+    TxtBCryptSHA384.text = GetHashString(MNew.MSBCrypt(EBCryptHashAlgo.ha_SHA384), GetValueFromUserInput)
 End Sub
 
 Private Sub BtnBCryptSHA512_Click()
-    TxtBCryptSHA256.text = GetHashString(MNew.MSBCrypt(EBCryptHashAlgo.ha_SHA512), GetValueFromUserInput)
+    TxtBCryptSHA512.text = GetHashString(MNew.MSBCrypt(EBCryptHashAlgo.ha_SHA512), GetValueFromUserInput)
 End Sub
+
+Private Sub BtnBCryptSelect_Click()
+    Dim sha As EBCryptHashAlgo: sha = CmbBCryptHashAlgos.ListIndex + 1
+    Dim HashAlgo As MSBCrypt: Set HashAlgo = MNew.MSBCrypt(sha)
+    If Not HashAlgo.WasSuccessful Then Exit Sub
+    HashAlgo.HashData GetValueFromUserInput 'm_FilBuf
+    TxtBCryptSelect.text = Hex_ToStr(HashAlgo.Finish)
+End Sub
+
