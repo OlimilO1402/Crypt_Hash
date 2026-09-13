@@ -20,12 +20,47 @@ Begin VB.Form FMain
    ScaleHeight     =   6870
    ScaleWidth      =   17670
    StartUpPosition =   3  'Windows-Standard
+   Begin VB.TextBox TxtAVBKLMRSHA 
+      BeginProperty Font 
+         Name            =   "Consolas"
+         Size            =   9.75
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      Height          =   450
+      Left            =   3720
+      MultiLine       =   -1  'True
+      TabIndex        =   31
+      Text            =   "FMain.frx":1782
+      Top             =   4080
+      Width           =   6735
+   End
+   Begin VB.CommandButton BtnAVBKLMRSHA 
+      Caption         =   "PFresle.SHA256"
+      BeginProperty Font 
+         Name            =   "Segoe UI"
+         Size            =   9
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      Height          =   375
+      Left            =   0
+      TabIndex        =   29
+      Top             =   4080
+      Width           =   1935
+   End
    Begin VB.ComboBox CmbBCryptHashAlgos 
       Height          =   375
       Left            =   1920
       TabIndex        =   27
       Text            =   "Combo1"
-      Top             =   5520
+      Top             =   6000
       Width           =   1815
    End
    Begin VB.TextBox TxtBCryptSelect 
@@ -43,8 +78,8 @@ Begin VB.Form FMain
       MultiLine       =   -1  'True
       ScrollBars      =   3  'Beides
       TabIndex        =   28
-      Text            =   "FMain.frx":1782
-      Top             =   5520
+      Text            =   "FMain.frx":1786
+      Top             =   6000
       Width           =   6735
    End
    Begin VB.CommandButton BtnBCryptSelect 
@@ -61,7 +96,7 @@ Begin VB.Form FMain
       Height          =   375
       Left            =   0
       TabIndex        =   26
-      Top             =   5520
+      Top             =   6000
       Width           =   1935
    End
    Begin VB.TextBox TxtBCryptSHA512 
@@ -78,8 +113,8 @@ Begin VB.Form FMain
       Left            =   3720
       MultiLine       =   -1  'True
       TabIndex        =   25
-      Text            =   "FMain.frx":1786
-      Top             =   5040
+      Text            =   "FMain.frx":178A
+      Top             =   5520
       Width           =   6735
    End
    Begin VB.TextBox TxtBCryptSHA384 
@@ -96,8 +131,8 @@ Begin VB.Form FMain
       Left            =   3720
       MultiLine       =   -1  'True
       TabIndex        =   22
-      Text            =   "FMain.frx":178A
-      Top             =   4560
+      Text            =   "FMain.frx":178E
+      Top             =   5040
       Width           =   6735
    End
    Begin VB.TextBox TxtBCryptSHA256 
@@ -114,8 +149,8 @@ Begin VB.Form FMain
       Left            =   3720
       MultiLine       =   -1  'True
       TabIndex        =   19
-      Text            =   "FMain.frx":178E
-      Top             =   4080
+      Text            =   "FMain.frx":1792
+      Top             =   4560
       Width           =   6735
    End
    Begin VB.TextBox TxtMSCryptSHA 
@@ -132,7 +167,7 @@ Begin VB.Form FMain
       Left            =   3720
       MultiLine       =   -1  'True
       TabIndex        =   16
-      Text            =   "FMain.frx":1792
+      Text            =   "FMain.frx":1796
       Top             =   3600
       Width           =   6735
    End
@@ -150,7 +185,7 @@ Begin VB.Form FMain
       Left            =   3720
       MultiLine       =   -1  'True
       TabIndex        =   13
-      Text            =   "FMain.frx":1796
+      Text            =   "FMain.frx":179A
       Top             =   3120
       Width           =   6735
    End
@@ -168,7 +203,7 @@ Begin VB.Form FMain
       Left            =   3720
       MultiLine       =   -1  'True
       TabIndex        =   10
-      Text            =   "FMain.frx":179A
+      Text            =   "FMain.frx":179E
       Top             =   2640
       Width           =   6735
    End
@@ -186,7 +221,7 @@ Begin VB.Form FMain
       Left            =   3720
       MultiLine       =   -1  'True
       TabIndex        =   7
-      Text            =   "FMain.frx":179E
+      Text            =   "FMain.frx":17A2
       Top             =   2160
       Width           =   6735
    End
@@ -204,7 +239,7 @@ Begin VB.Form FMain
       Left            =   3720
       MultiLine       =   -1  'True
       TabIndex        =   4
-      Text            =   "FMain.frx":17A2
+      Text            =   "FMain.frx":17A6
       Top             =   1680
       Width           =   6735
    End
@@ -222,7 +257,7 @@ Begin VB.Form FMain
       Height          =   375
       Left            =   0
       TabIndex        =   23
-      Top             =   5040
+      Top             =   5520
       Width           =   1935
    End
    Begin VB.CommandButton BtnBCryptSHA384 
@@ -239,7 +274,7 @@ Begin VB.Form FMain
       Height          =   375
       Left            =   0
       TabIndex        =   20
-      Top             =   4560
+      Top             =   5040
       Width           =   1935
    End
    Begin VB.CommandButton BtnCRC32MEF 
@@ -307,7 +342,7 @@ Begin VB.Form FMain
       Height          =   375
       Left            =   0
       TabIndex        =   17
-      Top             =   4080
+      Top             =   4560
       Width           =   1935
    End
    Begin VB.CommandButton BtnCRC32JAM 
@@ -351,6 +386,24 @@ Begin VB.Form FMain
       Top             =   3120
       Width           =   1935
    End
+   Begin VB.Label Label1 
+      AutoSize        =   -1  'True
+      Caption         =   "PFresle.SHA256:"
+      BeginProperty Font 
+         Name            =   "Consolas"
+         Size            =   9.75
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      Height          =   225
+      Left            =   2160
+      TabIndex        =   30
+      Top             =   4080
+      Width           =   1575
+   End
    Begin VB.Label LblBCrypt3 
       AutoSize        =   -1  'True
       Caption         =   "BCrypt.SHA512:"
@@ -366,7 +419,7 @@ Begin VB.Form FMain
       Height          =   225
       Left            =   2160
       TabIndex        =   24
-      Top             =   5040
+      Top             =   5520
       Width           =   1470
    End
    Begin VB.Label LblBCrypt2 
@@ -384,7 +437,7 @@ Begin VB.Form FMain
       Height          =   225
       Left            =   2160
       TabIndex        =   21
-      Top             =   4560
+      Top             =   5040
       Width           =   1470
    End
    Begin VB.Label LblCRC322 
@@ -456,7 +509,7 @@ Begin VB.Form FMain
       Height          =   225
       Left            =   2160
       TabIndex        =   18
-      Top             =   4080
+      Top             =   4560
       Width           =   1470
    End
    Begin VB.Label LBLDragDropFileCRC32 
@@ -545,47 +598,49 @@ Option Explicit
 'BCrypt.SHA512 = &H12a98085e307959d5d6e6d0ed361845b604a33f9b66d025f30cc0414d2fa374ea129e6e80a838dffc07e2334e9936119d5bb18443d3ecde58a2f1ec4306e6fb2
 Private m_PFN As String
 Private m_FilBuf() As Byte
-Private MSBCrypt As MSBCrypt
+Private m_BCHash As BCHash
 
 Private Sub Form_Load()
-    TxtUserText.text = "The Quick Brown Fox Jumps Over The Lazy Dog"
+    TxtUserText.text = "Quick Brown Fox Jumps Over The Lazy Dog"
     Me.Caption = Me.Caption & " v" & App.Major & "." & App.Minor & "." & App.Revision
-    Set MSBCrypt = New MSBCrypt
-    MSBCrypt.HashAlgos_ToCBLB CmbBCryptHashAlgos
+    Set m_BCHash = New BCHash
+    m_BCHash.HashAlgos_ToCBLB CmbBCryptHashAlgos
     CmbBCryptHashAlgos.ListIndex = EBCryptHashAlgo.ha_SHA256 - 1
 End Sub
 
 Private Sub Form_Resize()
-    Dim l As Single, t As Single, W As Single, H As Single
+    Dim l As Single, t As Single, W As Single, h As Single
     t = LBLDragDropFileCRC32.Top
     W = Me.ScaleWidth
-    H = LBLDragDropFileCRC32.Height
-    If W > 0 And H > 0 Then LBLDragDropFileCRC32.Move l, t, W, H
+    h = LBLDragDropFileCRC32.Height
+    If W > 0 And h > 0 Then LBLDragDropFileCRC32.Move l, t, W, h
     t = TxtUserText.Top
-    H = TxtUserText.Height
-    If W > 0 And H > 0 Then TxtUserText.Move l, t, W, H
+    h = TxtUserText.Height
+    If W > 0 And h > 0 Then TxtUserText.Move l, t, W, h
     l = TxtCRC32JAM.Left
     W = Me.ScaleWidth - l
-    H = TxtCRC32JAM.Height
+    h = TxtCRC32JAM.Height
     t = TxtCRC32JAM.Top
-    If W > 0 And H > 0 Then TxtCRC32JAM.Move l, t, W, H
+    If W > 0 And h > 0 Then TxtCRC32JAM.Move l, t, W, h
     t = TxtCRC32MEF.Top
-    If W > 0 And H > 0 Then TxtCRC32MEF.Move l, t, W, H
+    If W > 0 And h > 0 Then TxtCRC32MEF.Move l, t, W, h
     t = TxtMSCryptRC4.Top
-    If W > 0 And H > 0 Then TxtMSCryptRC4.Move l, t, W, H
+    If W > 0 And h > 0 Then TxtMSCryptRC4.Move l, t, W, h
     t = TxtMSCryptMD5.Top
-    If W > 0 And H > 0 Then TxtMSCryptMD5.Move l, t, W, H
+    If W > 0 And h > 0 Then TxtMSCryptMD5.Move l, t, W, h
     t = TxtMSCryptSHA.Top
-    If W > 0 And H > 0 Then TxtMSCryptSHA.Move l, t, W, H
+    If W > 0 And h > 0 Then TxtMSCryptSHA.Move l, t, W, h
+    t = TxtAVBKLMRSHA.Top
+    If W > 0 And h > 0 Then TxtAVBKLMRSHA.Move l, t, W, h
     t = TxtBCryptSHA256.Top
-    If W > 0 And H > 0 Then TxtBCryptSHA256.Move l, t, W, H
+    If W > 0 And h > 0 Then TxtBCryptSHA256.Move l, t, W, h
     t = TxtBCryptSHA384.Top
-    If W > 0 And H > 0 Then TxtBCryptSHA384.Move l, t, W, H
+    If W > 0 And h > 0 Then TxtBCryptSHA384.Move l, t, W, h
     t = TxtBCryptSHA512.Top
-    If W > 0 And H > 0 Then TxtBCryptSHA512.Move l, t, W, H
+    If W > 0 And h > 0 Then TxtBCryptSHA512.Move l, t, W, h
     t = TxtBCryptSelect.Top
-    H = Me.ScaleHeight - t
-    If W > 0 And H > 0 Then TxtBCryptSelect.Move l, t, W, H
+    h = Me.ScaleHeight - t
+    If W > 0 And h > 0 Then TxtBCryptSelect.Move l, t, W, h
 End Sub
 
 Private Sub LBLDragDropFileCRC32_OLEDragDrop(Data As DataObject, Effect As Long, Button As Integer, Shift As Integer, x As Single, y As Single)
@@ -613,11 +668,11 @@ Private Sub OnOLEDragDrop(Data As DataObject, Effect As Long, Button As Integer,
     'dt = Timer - dt:    MsgBox "HashAlgo MD5: " & dt & " sec":     dt = Timer
     TxtMSCryptSHA.text = GetHashString(MNew.MSCrypt(ECryptHashAlgo.ha_SHA), m_FilBuf)
     'dt = Timer - dt:    MsgBox "HashAlgo SHA: " & dt & " sec":     dt = Timer
-    TxtBCryptSHA256.text = GetHashString(MNew.MSBCrypt(EBCryptHashAlgo.ha_SHA256), m_FilBuf)
+    TxtBCryptSHA256.text = GetHashString(MNew.BCHash(EBCryptHashAlgo.ha_SHA256), m_FilBuf)
     'dt = Timer - dt:    MsgBox "HashAlgo SHA256: " & dt & " sec":     dt = Timer
-    TxtBCryptSHA384.text = GetHashString(MNew.MSBCrypt(EBCryptHashAlgo.ha_SHA384), m_FilBuf)
+    TxtBCryptSHA384.text = GetHashString(MNew.BCHash(EBCryptHashAlgo.ha_SHA384), m_FilBuf)
     'dt = Timer - dt:    MsgBox "HashAlgo SHA256: " & dt & " sec":     dt = Timer
-    TxtBCryptSHA512.text = GetHashString(MNew.MSBCrypt(EBCryptHashAlgo.ha_SHA512), m_FilBuf)
+    TxtBCryptSHA512.text = GetHashString(MNew.BCHash(EBCryptHashAlgo.ha_SHA512), m_FilBuf)
 End Sub
 
 Function GetFileBuffer(PFN As String) As Byte()
@@ -639,7 +694,8 @@ Function GetValueFromUserInput() As Byte()
         MsgBox "Please give a valid string in edittextbox"
         Exit Function
     End If
-    GetValueFromUserInput = StrConv(s, vbFromUnicode)
+    'GetValueFromUserInput = StrConv(s, vbFromUnicode)
+    GetValueFromUserInput = s 'StrConv(s, vbFromUnicode)
 End Function
 
 Private Function GetHashString(hasher As IHasher, Value() As Byte) As String
@@ -648,8 +704,8 @@ Try: On Error GoTo Catch
         MsgBox "Empty value!"
         Exit Function
     End If
-    Dim hash() As Byte: hash = hasher.GetHash(Value)
-    GetHashString = Hex_ToStr(hash)
+    Dim HASH() As Byte: HASH = hasher.GetHash(Value)
+    GetHashString = Hex_ToStr(HASH)
     Exit Function
 Catch:
     MsgBox "Error in FMain.GetHash maybe text is empty"
@@ -675,21 +731,25 @@ Private Sub BtnMSCryptSHA_Click()
     TxtMSCryptSHA.text = GetHashString(MNew.MSCrypt(ECryptHashAlgo.ha_SHA), GetValueFromUserInput)
 End Sub
 
+Private Sub BtnAVBKLMRSHA_Click()
+    TxtAVBKLMRSHA.text = GetHashString(MNew.CSHA256(EBCryptHashAlgo.ha_SHA256), GetValueFromUserInput)
+End Sub
+
 Private Sub BtnBCryptSHA256_Click()
-    TxtBCryptSHA256.text = GetHashString(MNew.MSBCrypt(EBCryptHashAlgo.ha_SHA256), GetValueFromUserInput)
+    TxtBCryptSHA256.text = GetHashString(MNew.BCHash(EBCryptHashAlgo.ha_SHA256), GetValueFromUserInput)
 End Sub
 
 Private Sub BtnBCryptSHA384_Click()
-    TxtBCryptSHA384.text = GetHashString(MNew.MSBCrypt(EBCryptHashAlgo.ha_SHA384), GetValueFromUserInput)
+    TxtBCryptSHA384.text = GetHashString(MNew.BCHash(EBCryptHashAlgo.ha_SHA384), GetValueFromUserInput)
 End Sub
 
 Private Sub BtnBCryptSHA512_Click()
-    TxtBCryptSHA512.text = GetHashString(MNew.MSBCrypt(EBCryptHashAlgo.ha_SHA512), GetValueFromUserInput)
+    TxtBCryptSHA512.text = GetHashString(MNew.BCHash(EBCryptHashAlgo.ha_SHA512), GetValueFromUserInput)
 End Sub
 
 Private Sub BtnBCryptSelect_Click()
     Dim sha As EBCryptHashAlgo: sha = CmbBCryptHashAlgos.ListIndex + 1
-    Dim HashAlgo As MSBCrypt: Set HashAlgo = MNew.MSBCrypt(sha)
+    Dim HashAlgo As BCHash: Set HashAlgo = MNew.BCHash(sha)
     If Not HashAlgo.WasSuccessful Then Exit Sub
     HashAlgo.HashData GetValueFromUserInput 'm_FilBuf
     TxtBCryptSelect.text = Hex_ToStr(HashAlgo.Finish)
